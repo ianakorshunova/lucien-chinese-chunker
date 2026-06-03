@@ -4,6 +4,10 @@ Lucien is a lightweight rule-based Chinese sentence chunker.
 
 It breaks simple Chinese sentences into meaningful chunks, labels their basic functions, identifies simple state phrases, and provides short learner-friendly explanations.
 
+## 🌐 Live Demo
+
+Try the app here: [Lucien Chinese Chunker](https://lucien-chinese-chunker.streamlit.app/)
+
 ## 📌 Overview
 
 Lucien is designed as an educational NLP prototype for Chinese sentence analysis.
@@ -213,7 +217,7 @@ Current limitations:
 * Support emotional and idiomatic expressions, such as `累死我了`
 * Improve intensity labels for degree words such as `很`
 * Add pinyin support
-* Deploy the Streamlit app online
+* Improve the Streamlit interface
 
 ## 📌 Status
 
