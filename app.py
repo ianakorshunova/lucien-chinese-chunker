@@ -9,29 +9,65 @@ from lucien_core import (
 
 st.set_page_config(page_title="Lucien", page_icon="🧩", layout="centered")
 
+EXAMPLES = {
+    "Degree + state: 我今天很累": "我今天很累",
+    "Negative state: 我今天不累": "我今天不累",
+    "Mild negative: 我今天不太累": "我今天不太累",
+    "Mild state: 我今天有点累": "我今天有点累",
+    "Emphatic negation: 我今天一点也不累": "我今天一点也不累",
+    "Emphatic negation with 儿: 我今天一点儿也不累": "我今天一点儿也不累",
+}
+
+
+with st.sidebar:
+    st.title("Lucien 🧩")
+    st.markdown("**Chinese sentence chunker**")
+
+    st.markdown("### What it analyzes")
+    st.write("• Sentence chunks")
+    st.write("• Basic syntax roles")
+    st.write("• State phrases")
+    st.write("• Polarity and intensity")
+    st.write("• English + 中文 explanations")
+
+    st.markdown("### Current scope")
+    st.caption(
+        "Lucien is a small educational NLP prototype. "
+        "It supports a limited set of simple Chinese sentence patterns."
+    )
+
+    st.markdown("### Tech")
+    st.caption("Python · Streamlit · pytest · Rule-based NLP")
+
+    st.markdown("### Note")
+    st.caption(
+        "Lucien is a prototype and does not perform full Chinese parsing or word segmentation."
+    )
+
+
 st.title("Lucien 🧩")
-st.subheader("Chinese Sentence Chunker")
+st.markdown("## Chinese Sentence Chunker")
 
 st.write(
-    "Lucien is a small rule-based tool that breaks simple Chinese sentences "
-    "into meaningful chunks and explains their basic structure."
+    "Lucien breaks simple Chinese sentences into meaningful chunks, identifies "
+    "basic syntax roles, and explains state expressions in a learner-friendly way."
 )
+
+st.markdown("---")
 
 st.markdown("### Try an example")
 
-example = st.selectbox(
+example_label = st.selectbox(
     "Choose a sample sentence:",
-    [
-        "我今天很累",
-        "我今天不累",
-        "我今天不太累",
-        "我今天有点累",
-        "我今天一点也不累",
-        "我今天一点儿也不累",
-    ],
+    list(EXAMPLES.keys()),
 )
 
-sentence = st.text_input("Or enter your own Chinese sentence:", example)
+default_sentence = EXAMPLES[example_label]
+
+sentence = st.text_input(
+    "Or enter your own Chinese sentence:",
+    value=default_sentence,
+)
 
 if sentence:
     result = analyze_sentence(sentence)
@@ -40,7 +76,15 @@ if sentence:
     st.success(result["sentence"])
 
     st.markdown("### Chunks")
-    st.write(" | ".join(result["refined_chunks"]))
+    chunk_html = " <span style='color: #777;'>→</span> ".join(
+        [
+            f"<span style='font-size: 28px; padding: 6px 10px; "
+            f"background-color: #f5f5f5; border-radius: 8px;'>{chunk}</span>"
+            for chunk in result["refined_chunks"]
+        ]
+    )
+    
+    st.markdown(chunk_html, unsafe_allow_html=True)
 
     st.markdown("### Basic syntax")
 
@@ -58,28 +102,42 @@ if sentence:
         st.metric("Predicate", syntax.get("predicate") or "—")
 
     st.markdown("### Meaning")
-    st.write(generate_explanation(result))
 
-    st.markdown("### 中文解释")
-    st.write(generate_explanation_zh(result))
+    with st.container(border=True):
+        st.markdown("**English explanation**")
+        st.write(generate_explanation(result))
 
-    st.markdown("### Labeled chunks")
+    with st.container(border=True):
+        st.markdown("**中文解释**")
+        st.write(generate_explanation_zh(result))
 
-    for item in result["labeled_chunks"]:
-        st.markdown(f"**{item['chunk']}** — `{item['label']}`")
+    st.markdown("### Analysis details")
 
-    st.markdown("### Merged phrases")
+    tab1, tab2 = st.tabs(["Labeled chunks", "Merged phrases"])
 
-    for item in result["merged_phrases"]:
-        label = item.get("label", "unknown")
-        text = item.get("text", "")
+    with tab1:
+        for item in result["labeled_chunks"]:
+            st.markdown(f"**{item['chunk']}** — `{item['label']}`")
 
-        st.markdown(f"**{text}** — `{label}`")
+    with tab2:
+        for item in result["merged_phrases"]:
+            label = item.get("label", "unknown")
+            text = item.get("text", "")
 
-        if label == "state_phrase":
-            st.write(f"Polarity: `{item.get('polarity')}`")
-            st.write(f"Intensity: `{item.get('intensity')}`")
-            st.write(f"Tone: `{item.get('tone')}`")
+            with st.container(border=True):
+                st.markdown(f"**{text}** — `{label}`")
+
+                if label == "state_phrase":
+                    col1, col2, col3 = st.columns(3)
+
+                    with col1:
+                        st.metric("Polarity", item.get("polarity") or "—")
+
+                    with col2:
+                        st.metric("Intensity", item.get("intensity") or "—")
+
+                    with col3:
+                        st.metric("Tone", item.get("tone") or "—")
 
     with st.expander("Structured JSON output"):
         st.json(result)
