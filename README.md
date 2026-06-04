@@ -8,6 +8,10 @@ It breaks simple Chinese sentences into meaningful chunks, labels their basic fu
 
 Try the app here: [Lucien Chinese Chunker](https://lucien-chinese-chunker.streamlit.app/)
 
+## 📸 Screenshot
+
+![Lucien demo](assets/lucien-demo.png)
+
 ## 📌 Overview
 
 Lucien is designed as an educational NLP prototype for Chinese sentence analysis.
