@@ -128,16 +128,16 @@ if sentence:
                 st.markdown(f"**{text}** — `{label}`")
 
                 if label == "state_phrase":
-                    col1, col2, col3 = st.columns(3)
-
-                    with col1:
-                        st.metric("Polarity", item.get("polarity") or "—")
-
-                    with col2:
-                        st.metric("Intensity", item.get("intensity") or "—")
-
-                    with col3:
-                        st.metric("Tone", item.get("tone") or "—")
+                    st.markdown(
+                        f"""
+                        <div style="font-size: 18px; line-height: 1.8;">
+                            <strong>Polarity:</strong> <code>{item.get("polarity") or "—"}</code><br>
+                            <strong>Intensity:</strong> <code>{item.get("intensity") or "—"}</code><br>
+                            <strong>Tone:</strong> <code>{item.get("tone") or "—"}</code>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
     with st.expander("Structured JSON output"):
         st.json(result)
